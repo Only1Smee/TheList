@@ -669,7 +669,7 @@ const Sniper = {
     this.tick(dt);
     this.hud();
   },
-  drag(dx, dy) { const s = this.fov / Math.max(320, innerHeight); this.yaw += dx * s; this.pitch = Math.max(-0.15, Math.min(1.35, this.pitch - dy * s)); },
+  drag(dx, dy) { const s = this.fov / Math.max(320, innerHeight) * (Game.S.settings.invLook ? -1 : 1); this.yaw -= dx * s; this.pitch = Math.max(-0.15, Math.min(1.35, this.pitch + dy * s)); },
   zoomBy(f) { const z = this.rifle.zoom; this.zoom = Math.max(1, Math.min(z, this.zoom * f)); },
   setZoom(z) { this.zoom = Math.max(1, Math.min(this.rifle.zoom, z)); Sfx.play('tick'); },
   tick(dt) {

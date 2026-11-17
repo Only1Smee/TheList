@@ -1,4 +1,4 @@
-const CACHE = 'the-list-v3';
+const CACHE = 'the-list-v4';
 const ASSETS = ['./', './index.html', './manifest.json', './engine.js', './world.js', './data.js', './maps.js', './game.js', './audio.js', './progress.js', './story.js', './icons.js', './tutorial.js', './ui.js', './menus.js', './extras.js', './controls.js', './icon-192.png', './icon-512.png', './maskable-192.png', './maskable-512.png', './apple-touch-icon.png', './favicon.ico', './list-display.woff', './list-type.woff', './contract-text.woff', './contract-text-bold.woff', './music.json', './hideout.mp3', './mission.mp3', './combat.mp3'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });

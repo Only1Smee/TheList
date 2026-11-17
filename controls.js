@@ -47,7 +47,8 @@ const Controls = {
         const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
         if (this._pd) this.dist = Math.max(2.2, Math.min(9, this.dist * this._pd / d)); this._pd = d; return;
       }
-      this.yaw -= dx * 0.0058; this.pitch = Math.max(this.view === 'first' ? -1.1 : 0.02, Math.min(this.view === 'first' ? 1.15 : 1.1, this.pitch + dy * 0.0045));
+      const iv = Game.S.settings.invLook ? -1 : 1;
+      this.yaw -= dx * 0.0058 * iv; this.pitch = Math.max(this.view === 'first' ? -1.1 : 0.02, Math.min(this.view === 'first' ? 1.15 : 1.1, this.pitch + dy * 0.0045 * iv));
     });
     const pend = e => {
       const p = pts.get(e.pointerId); if (!p) return; pts.delete(e.pointerId); this._pd = 0;
@@ -211,12 +212,23 @@ const Controls = {
     const s = Game.S.settings;
     const v = el('button', 'btn', `{i:eye} Camera: ${VIEW_NAMES[Controls.view]}`);
     v.onclick = () => { Controls.cycle(); this.settings(); };
+    const il = el('button', 'btn', `Camera drag: ${s.invLook ? 'Inverted' : 'Normal'}`);
+    il.onclick = () => { s.invLook = !s.invLook; Game.save(); this.settings(); };
     const j = el('button', 'btn', `Joystick in top-down view: ${s.stickTop ? 'On' : 'Off'}`);
     j.onclick = () => { s.stickTop = !s.stickTop; Game.save(); Controls.hud(); this.settings(); };
-    wrap.insertBefore(j, wrap.firstChild); wrap.insertBefore(v, wrap.firstChild);
+    wrap.insertBefore(j, wrap.firstChild); wrap.insertBefore(il, wrap.firstChild); wrap.insertBefore(v, wrap.firstChild);
   };
   const hide = UI.hideAll;
   UI.hideAll = function () { hide.call(this); ['#stickzone', '#lookpad', '#xhair', '#useBtn'].forEach(x => { const e = $(x); if (e) e.classList.add('hidden'); }); };
   const lm = Game.loadMap;
   Game.loadMap = function (M) { const r = lm.call(this, M); if (Controls.view !== 'top') { Controls.yaw = Engine.cam.yaw; Controls.cd = 1; } return r; };
+})();
+
+/* landscape only: ask the browser to lock orientation, pause while the phone is upright */
+(function () {
+  const tryLock = () => { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => { }); } catch (e) { } };
+  addEventListener('pointerdown', tryLock, { once: true });
+  const mq = matchMedia('(orientation:portrait) and (pointer:coarse)');
+  const chk = () => { if (mq.matches && Game.mode === 'mission' && !Game.paused) UI.pause(); };
+  if (mq.addEventListener) mq.addEventListener('change', chk); else mq.addListener(chk);
 })();

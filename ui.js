@@ -596,7 +596,7 @@ const Input = {
       const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
       if (this.ptrs.size === 1) {
         if (this.start && Math.hypot(e.clientX - this.start.x, e.clientY - this.start.y) > 9) this.drag = true;
-        if (this.drag && Sniper.active()) Sniper.drag(dx, dy); else if (this.drag) { Engine.cam.yaw -= dx * 0.008; Engine.cam.pitch = Math.max(0.12, Math.min(1.4, Engine.cam.pitch + dy * 0.005)); }
+        if (this.drag && Sniper.active()) Sniper.drag(dx, dy); else if (this.drag) { const iv = Game.S.settings.invLook ? -1 : 1; Engine.cam.yaw -= dx * 0.008 * iv; Engine.cam.pitch = Math.max(0.12, Math.min(1.4, Engine.cam.pitch + dy * 0.005 * iv)); }
       } else if (this.ptrs.size === 2) {
         const [a, b] = [...this.ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y);
         if (this.pinch && Sniper.active()) Sniper.zoomBy(d / this.pinch); else if (this.pinch) Engine.cam.dist = Math.max(3.5, Math.min(42, Engine.cam.dist * this.pinch / d));
