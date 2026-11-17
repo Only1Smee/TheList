@@ -94,7 +94,14 @@ const ICON_PATHS = {
   reload: '<path d="M20 11a8 8 0 10-2 6"/><path d="M20 4v7h-7"/>',
   heart: '<path d="M12 20s-8-5-8-11a4 4 0 018-1 4 4 0 018 1c0 6-8 11-8 11z"/>',
   layers: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
-  fast: '<path d="M3 5l8 7-8 7zM12 5l8 7-8 7z"/>'
+  fast: '<path d="M3 5l8 7-8 7zM12 5l8 7-8 7z"/>',
+  match: '<path d="M8 22l7-13"/><path d="M15.5 8.2a2 2 0 102.6-3.9 2 2 0 00-2.6 3.9z"/><path d="M17.5 2c1.5 1 2 2.6 1.4 4"/>',
+  hammer: '<path d="M4 20l9-9"/><path d="M12 5l3-3 7 7-3 3-2-2-3 3-4-4 3-3z"/>',
+  envelope: '<rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/>',
+  thread: '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="9" cy="18" r="2"/><path d="M7.8 6.6l8.4 1.8M16.6 10.6l-6.2 6M7 16.2L6.4 8"/>',
+  coat: '<path d="M8 3l4 4 4-4 4 3-2 5v10H6V11L4 6z"/><path d="M12 7v14"/>',
+  folder: '<path d="M3 6h7l2 2h9v11H3z"/>',
+  crowbar: '<path d="M5 21L18 4c1-1 3 0 2 2"/><path d="M5 21l-2-2"/>'
 };
 function ic(name, cls) {
   const p = ICON_PATHS[name] || ICON_PATHS.target;

@@ -35,7 +35,7 @@ const Game = {
     this.loadMap(M);
     this.P = this.makePlayer(M.spawn, 'suit');
     this.P.face = Math.PI;
-    Engine.cam.yaw = Math.PI + 0.5; Engine.cam.pitch = 0.95; Engine.cam.dist = 19;
+    Engine.cam.yaw = Math.PI + 0.45; Engine.cam.pitch = 0.92; Engine.cam.dist = innerWidth < innerHeight ? 27 : 15.5;
     this.snapCam();
     UI.showHideout();
   },
@@ -254,6 +254,7 @@ const Game = {
     this.time += dt; this.pathBudget = 4;
     if (this.mode === 'mission') this.stats.t += dt;
     this.updatePlayer(dt);
+    Controls.move(dt);
     if (this.mode === 'hideout') Pets.update(dt);
     if (this.mode === 'mission') {
       Records.tick(dt);
@@ -280,6 +281,7 @@ const Game = {
       const land = innerWidth > innerHeight;
       if (land) { gx += Math.cos(c.yaw) * 1.1; gz -= Math.sin(c.yaw) * 1.1; } else { gy -= 0.75; }
     }
+    if (this.mode === 'hideout' && this.M && this.M.hideout && !this.M.flashback) { gx = 19.5 + (gx - 19.5) * 0.35; gz = 17.4 + (gz - 17.4) * 0.35; }
     c.tx += (gx - c.tx) * k; c.ty += (gy - c.ty) * k; c.tz += (gz - c.tz) * k;
     if (this.intro) {
       const I = this.intro; I.t += realDt;
@@ -301,6 +303,7 @@ const Game = {
     this.updateCut();
     Engine.fadeTarget = this.intro || (P && P.dead) ? null : [P.x, P.y, P.z];
     if (this.mode === 'mission' && this.C.mode === 'sniper') Sniper.camera(realDt);
+    else if (Controls.active()) Controls.camera(realDt);
     // lights: nearest 10
     const bo = this.mode === 'mission' && this.blackout;
     const L = bo ? this.M.lights.filter(l => !(Math.abs(l.y - bo.y - 2) < 2.2 && l.x >= BX && l.x < BX + BW && l.z >= BZ && l.z < BZ + BD)) : this.M.lights;
@@ -312,23 +315,49 @@ const Game = {
     UI.updateHUD && UI.updateHUD(dt);
   },
   updateCut() {
+    if (Controls.active()) { this.cutY = 999; Engine.cut = 999; return; }
     const P = this.P, W = this.W;
     if (this.M.hideout) { Engine.cut = 6.5; return; }
     if (this.mode === 'mission' && this.C && this.C.mode === 'sniper') return;
     const b = this.M.building;
-    const inside = P.x >= b.x0 - 1 && P.x <= b.x1 + 1 && P.z >= b.z0 - 1 && P.z <= b.z1 + 1;
+    const mg = this._inside ? 2 : 1;
+    const inside = P.x >= b.x0 - mg && P.x <= b.x1 + mg && P.z >= b.z0 - mg && P.z <= b.z1 + mg;
+    this._inside = inside;
     let cut = 999;
     if (inside) {
-      // floor level
+      // floor level, with hysteresis on stairs so the view doesn't flicker
       const fl = this.M.floors; let lv = fl[0];
       for (const f of fl) if (P.y >= f - 0.5) lv = f;
+      if (this._lv !== undefined && lv < this._lv && P.y > this._lv - 1.6) lv = this._lv;
+      this._lv = lv;
       cut = lv + 2.9;
       // check there is something above (otherwise roof → keep)
     } else {
       // outdoor: cut tall stuff under shed etc
       for (let yy = Math.floor(P.y) + 2; yy < Math.floor(P.y) + 6; yy++) if (W.cutF[W.idx(Math.floor(P.x), Math.min(W.H - 1, yy), Math.floor(P.z))] && W.solid(Math.floor(P.x), yy, Math.floor(P.z))) { cut = Math.floor(P.y) + 2.9; break; }
     }
-    this.cutY = cut; Engine.cut = cut;
+    this.cutY = cut;
+    // ease the visible cut so floors slide in and out instead of popping
+    const vis = cut > 500 ? (b.top + 3) : cut;
+    if (this._cv === undefined || Math.abs(this._cv - vis) > 30 || this._cvM !== this.M) { this._cv = vis; this._cvM = this.M; }
+    this._cv += (vis - this._cv) * 0.16;
+    if (Math.abs(this._cv - vis) < 0.05) this._cv = vis;
+    Engine.cut = cut > 500 && this._cv === vis ? 999 : this._cv;
+  },
+  // tap ray: passes through walls and wall tops until it finds somewhere you can stand
+  tapRay(r) {
+    const W = this.W, o = r.o, d = r.d; let acc = 0, first = null;
+    for (let k = 0; k < 24; k++) {
+      const oo = [o[0] + d[0] * acc, o[1] + d[1] * acc, o[2] + d[2] * acc];
+      const h = W.raycast(oo, d, 200 - acc, this.cutY); if (!h) return first;
+      h.t += acc; if (!first) first = h;
+      let cx = h.x + h.face[0], cy = h.y + h.face[1], cz = h.z + h.face[2];
+      if (h.face[1] !== 1) { const gy = W.groundAt(cx, cz, cy); if (gy >= 0) cy = gy; }
+      if (h.face[1] === 1 && W.walkable(cx, cy, cz)) return h;
+      if (h.face[1] !== 1 && W.walkable(cx, cy, cz) && !W.cutF[W.idx(h.x, h.y, h.z)]) return h;
+      acc = h.t + 0.05; if (acc > 200) break;
+    }
+    return first;
   },
 
   /* ---------- movement ---------- */
@@ -457,7 +486,7 @@ const Game = {
       const t = rayAABB(r.o, r.d, [pr.p[0] - s, y0 - 0.1, pr.p[2] - s], [pr.p[0] + s, y0 + h, pr.p[2] + s]);
       if (t >= 0 && t < bt) { bt = t; best = pr; }
     }
-    const hit = this.W.raycast(r.o, r.d, 200, this.cutY);
+    const hit = this.tapRay(r);
     const ht = hit ? hit.t : 1e9;
     const held = this.heldItem();
     if (best && bt < ht + 0.6) {
@@ -1225,7 +1254,7 @@ const Game = {
     const near = (x, z, r) => (x - cam.tx) ** 2 + (z - cam.tz) ** 2 < r * r;
     Extras.drawActors(t);
     // player
-    if (P && !P.hidden) {
+    if (P && !P.hidden && !Controls.fp()) {
       if (P.carrying) { const b = P.carrying; drawCharacter(P.x - Math.sin(P.face) * 1.15, P.y, P.z - Math.cos(P.face) * 1.15, P.face + Math.PI, b.looks, b.outfit, null, { dead: true, deadK: 1 }); }
       drawCharacter(P.x, P.y, P.z, P.face, this.S.look, P.outfit, this.S.look.suit, { caseOn: this.mode === 'hideout' && !P.moving, walk: P.moving, phase: P.phase, act: !!P.action, aim: P.aimT > 0, dead: P.dead, deadK: P.dead ? Math.min(1, (this.time - (P.deathT || 0)) / 0.5) : 1, drag: !!P.carrying && !P.action, idle: P.blend ? 'blend' : P.blend === false ? null : null, t });
     }

@@ -541,7 +541,7 @@ const UI = {
     }
     for (const t2 of Game.targets || []) if (t2 !== Game.target && t2.state !== 'dead' && (Game.C.intel >= 1 || Game.targetVisible)) dot(t2.x, t2.z, 1.4, '#f55');
     const t = Game.target;
-    if (t && (Game.C.intel >= 1 || Game.targetVisible)) { dot(t.x, t.z, 1.5, t.state === 'dead' ? '#700' : '#f22'); if (Math.abs(t.y - P.y) > 2) { ctx.strokeStyle = '#f22'; ctx.lineWidth = 0.4; ctx.beginPath(); ctx.arc(t.x, t.z, 2.4, 0, 7); ctx.stroke(); } }
+    if (t && (Game.C.intel >= 1 || Game.targetVisible)) { dot(t.x, t.z, 1.5, t.state === 'dead' ? '#654' : '#ff8a3d'); if (Math.abs(t.y - P.y) > 2) { ctx.strokeStyle = '#ff8a3d'; ctx.lineWidth = 0.4; ctx.beginPath(); ctx.arc(t.x, t.z, 2.4, 0, 7); ctx.stroke(); } }
     ctx.restore();
     // player arrow
     ctx.save(); ctx.translate(S / 2, S / 2); ctx.rotate(Math.PI - yaw - P.face + Math.PI);

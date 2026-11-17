@@ -1101,60 +1101,64 @@ const HIDE_W = 40, HIDE_H = 22, HIDE_D = 36;
 function buildHideout(tier) {
   const w = new World(HIDE_W, HIDE_H, HIDE_D);
   const M = { world: w, props: [], lights: [], spots: {}, hideout: true };
-  const y = 3;
-  const floorT = [B.CONCRETE, B.WOOD, B.MARBLE, B.MARBLE_B][tier];
+  const y = 3, X0 = 12, X1 = 27, Z0 = 10, Z1 = 23;
+  const floorT = [B.CONCRETE, B.WOOD, B.WOOD_D, B.MARBLE_B][tier];
   const wallT = [B.CONCRETE, B.BRICK, B.PLASTER, B.TOWER_D][tier];
   box(w, 0, 0, 0, HIDE_W - 1, y - 2, HIDE_D - 1, B.STONE);
   box(w, 0, y - 1, 0, HIDE_W - 1, y - 1, HIDE_D - 1, B.ASPHALT);
-  // room
-  box(w, 8, y - 1, 8, 31, y - 1, 27, floorT);
+  box(w, X0, y - 1, Z0, X1, y - 1, Z1, floorT);
   w.cutMode = 1;
-  hollow(w, 8, y, 8, 31, y + 4, 27, wallT);
-  // windows on back wall
-  if (tier >= 1) for (let x = 11; x < 30; x += 4) box(w, x, y + 1, 27, x + 1, y + 3, 27, B.GLASS);
-  if (tier >= 3) box(w, 10, y + 1, 27, 29, y + 3, 27, B.GLASS);
-  // city outside
+  hollow(w, X0, y, Z0, X1, y + 4, Z1, wallT);
+  // windows on the back wall, either side of the List / trophy wall
+  for (const x of [14, 15, 23, 24]) box(w, x, y + 1, Z1, x, y + 3, Z1, B.GLASS);
+  if (tier >= 3) { box(w, 13, y + 1, Z1, 16, y + 3, Z1, B.GLASS); box(w, 22, y + 1, Z1, 25, y + 3, Z1, B.GLASS); }
   const rng = RNG(77 + tier);
   w.cutMode = 0;
-  for (let x = 0; x < HIDE_W; x += rng.int(3, 5)) { const h = rng.int(6, 18); box(w, x, y - 1, 31 + rng.int(0, 2), x + 2, y + h, 34, rng.pick([B.TOWER, B.TOWER_D, B.TOWER_W])); }
+  for (let x = 0; x < HIDE_W; x += rng.int(3, 5)) { const h = rng.int(6, 18); box(w, x, y - 1, Z1 + 4 + rng.int(0, 2), x + 2, y + h, Z1 + 7, rng.pick([B.TOWER, B.TOWER_D, B.TOWER_W])); }
   w.cutMode = 1;
-  // trim
-  if (tier >= 2) { for (let x = 8; x <= 31; x++) { w.set(x, y + 4, 8, B.GOLD); w.set(x, y + 4, 27, B.GOLD); } }
-  // decor per tier
+  if (tier >= 2) for (let x = X0; x <= X1; x++) { w.set(x, y + 4, Z0, B.GOLD); w.set(x, y + 4, Z1, B.GOLD); }
+  // framed pictures and a city map on the walls
+  box(w, X0, y + 1, 18, X0, y + 2, 21, B.BLUE); w.set(X0, y + 2, 19, B.GRASS); w.set(X0, y + 1, 20, B.YELLOW); w.set(X0, y + 2, 21, B.RED);
+  w.set(X1, y + 2, 13, tier >= 2 ? B.GOLD : B.WOOD_D); w.set(X1, y + 2, 15, rng.pick([B.RED, B.BLUE, B.YELLOW]));
+  w.cutMode = 0;
+  // ceiling lamp over the table, wall lamps
+  M.lights.push({ x: 19.5, y: y + 3.4, z: 16.5, r: 11, c: [1.0, 0.86, 0.64] });
+  // left side: bookshelf, plants, (aquarium)
+  box(w, X0 + 1, y, 16, X0 + 1, y + 2, 17, tier >= 1 ? B.BOOKS : B.WOOD);
+  if (tier >= 2) { box(w, X0 + 1, y, 13, X0 + 1, y + 2, 15, B.GLASS); box(w, X0 + 1, y, 14, X0 + 1, y + 1, 14, B.WATER); M.lights.push({ x: 13.5, y: y + 1.5, z: 14, r: 5, c: [0.3, 0.7, 1.0] }); }
+  else { w.set(X0 + 1, y, 14, B.WOOD); w.set(X0 + 1, y + 1, 14, B.LEAVES); }
+  for (const [x, z] of [[X0 + 1, Z0 + 1], [X1 - 1, 16]]) { w.set(x, y, z, B.TERRA); w.set(x, y + 1, z, B.LEAVES); }
+  // centre rug under the contracts table
+  if (tier >= 1) box(w, 16, y - 1, 14, 23, y - 1, 19, [0, B.CARPET_R, B.CARPET_B, B.CARPET_K][tier]);
+  // back right: sleeping corner or lounge
   if (tier === 0) {
-    box(w, 10, y, 23, 12, y, 25, B.FABRIC_D); // mattress
-    for (const [x, z] of [[28, 24], [29, 24], [28, 25]]) w.set(x, y, z, B.WOOD);
-    M.lights.push({ x: 20, y: y + 3, z: 18, r: 14, c: [1.0, 0.85, 0.6] });
+    box(w, 21, y, 11, 24, y, 12, B.FABRIC_D);
+    for (const [x, z] of [[25, 11], [25, 12], [24, 13]]) w.set(x, y, z, B.WOOD);
+    w.set(25, y + 1, 11, B.WOOD);
+    M.lights.push({ x: 23, y: y + 2.5, z: 12, r: 7, c: [1.0, 0.75, 0.45] });
+  } else {
+    box(w, 21, y, 11, 24, y, 11, tier >= 2 ? B.LEATHER : B.FABRIC);
+    box(w, 22, y, 13, 23, y, 13, B.WOOD_D);
+    M.lights.push({ x: 22.5, y: y + 2.8, z: 12, r: 7, c: [1.0, 0.82, 0.58] });
   }
-  if (tier >= 1) {
-    box(w, 14, y - 1, 15, 24, y - 1, 21, [0, B.CARPET_R, B.CARPET_B, B.CARPET_K][tier]);
-    box(w, 14, y, 24, 18, y, 25, tier >= 2 ? B.LEATHER : B.FABRIC); // sofa
-    box(w, 15, y, 22, 17, y, 22, B.WOOD_D); // coffee table
-    box(w, 15, y + 1, 26, 17, y + 2, 26, B.SCREEN);
-    w.set(10, y, 10, B.LEAVES); w.set(29, y, 10, B.LEAVES);
-    M.lights.push({ x: 16, y: y + 3, z: 22, r: 10, c: [1.0, 0.85, 0.6] }, { x: 26, y: y + 3, z: 14, r: 10, c: [1.0, 0.85, 0.6] });
-  }
+  // front left: bar
   if (tier >= 2) {
-    box(w, 26, y, 22, 30, y, 22, B.MARBLE_B); box(w, 30, y, 23, 30, y, 26, B.MARBLE_B); // bar
-    box(w, 27, y, 26, 29, y + 1, 26, B.BOOKS);
-    box(w, 9, y, 14, 9, y + 2, 20, B.GLASS); box(w, 9, y, 15, 9, y + 1, 19, B.WATER); // aquarium
-    for (const z of [12, 16]) w.set(31, y + 2, z, rng.pick([B.RED, B.BLUE, B.YELLOW]));
-    M.lights.push({ x: 28, y: y + 2, z: 24, r: 7, c: [1.0, 0.6, 0.3] }, { x: 10, y: y + 1, z: 17, r: 6, c: [0.3, 0.7, 1.0] });
+    box(w, 14, y, 11, 16, y, 11, B.MARBLE_B); w.set(14, y + 1, 11, B.BOOKS); w.set(16, y + 1, 11, B.BOOKS);
+    M.lights.push({ x: 15, y: y + 2, z: 12, r: 5, c: [1.0, 0.6, 0.3] });
   }
   if (tier >= 3) {
-    for (const x of [12, 27]) { w.set(x, y, 12, B.GOLD); w.set(x, y + 1, 12, B.GOLD); }
-    box(w, 8, y + 4, 8, 31, y + 4, 8, B.NEON_P);
-    box(w, 19, y - 1, 9, 20, y - 1, 26, B.GOLD);
-    M.lights.push({ x: 20, y: y + 3, z: 10, r: 12, c: [1.0, 0.4, 0.9] }, { x: 14, y: y + 3, z: 20, r: 12, c: [1.1, 0.9, 0.7] });
+    box(w, X0, y + 4, Z1, X1, y + 4, Z1, B.NEON_C);
+    box(w, 19, y - 1, Z0 + 1, 20, y - 1, Z1 - 1, B.GOLD);
+    for (const z of [12, 20]) { w.set(X1 - 1, y, z, B.GOLD); w.set(X1 - 1, y + 1, z, B.LAMP); }
+    M.lights.push({ x: 19.5, y: y + 3.5, z: 22, r: 9, c: [0.4, 0.9, 1.0] });
   }
   w.cutMode = 0;
-  // stations
-  M.props.push({ type: 'station', st: 'wardrobe', p: [11.5, y, 10.5], name: 'Wardrobe' });
-  M.props.push({ type: 'station', st: 'armory', p: [20.5, y, 9.5], name: 'Armory' });
-  M.props.push({ type: 'station', st: 'gear', p: [28.5, y, 13.5], name: 'Gear Locker' });
-  M.props.push({ type: 'station', st: 'contracts', p: [20.5, y, 18.5], name: 'Contracts Table' });
-  M.props.push({ type: 'station', st: 'upgrades', p: [24.5, y, 25.5], name: 'Upgrade Terminal' });
-  M.spawn = [20, y, 14];
+  M.props.push({ type: 'station', st: 'wardrobe', p: [14.8, y, 22.2], rot: Math.PI, name: 'Wardrobe' });
+  M.props.push({ type: 'station', st: 'armory', p: [24.3, y, 22.4], rot: Math.PI, name: 'The Fence' });
+  M.props.push({ type: 'station', st: 'gear', p: [26.3, y, 18.6], rot: -Math.PI / 2, name: 'Kit Bag' });
+  M.props.push({ type: 'station', st: 'contracts', p: [19.5, y, 16.5], name: 'The Hunt' });
+  M.props.push({ type: 'station', st: 'upgrades', p: [26.1, y, 13.6], rot: -Math.PI / 2, name: 'Rebuild' });
+  M.spawn = [19, y, 14];
   M.env = TIMES.night;
   return M;
 }

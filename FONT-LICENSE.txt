@@ -1,4 +1,19 @@
-Fonts in this folder are modified, subsetted versions of Poppins
-(Copyright 2020 The Poppins Project Authors, https://github.com/itfoundry/Poppins),
-renamed "Contract Display" / "Contract Text". They are licensed under the
-SIL Open Font License, Version 1.1 — https://openfontlicense.org
+Fonts used in The List
+======================
+
+List Display (list-display.woff)
+  Modified (subset, horizontally condensed, renamed) from Liberation Serif Bold.
+  Liberation fonts: Copyright (c) 2012 Red Hat, Inc. Licensed under the SIL Open Font License, Version 1.1.
+
+List Type (list-type.woff)
+  Modified (subset, renamed) from FreeMono Bold, part of GNU FreeFont.
+  GNU FreeFont is free software licensed under the GNU GPL v3 or later, with the
+  font exception: embedding the font in a document does not by itself cause the
+  document to be covered by the GPL.
+
+Contract Text (contract-text.woff, contract-text-bold.woff)
+  Modified (subset, renamed) from Poppins by the Indian Type Foundry.
+  Licensed under the SIL Open Font License, Version 1.1.
+
+SIL Open Font License 1.1: https://openfontlicense.org
+GNU GPL v3: https://www.gnu.org/licenses/gpl-3.0.html

@@ -13,9 +13,11 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="contract-display.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="list-display.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="list-type.woff" as="font" type="font/woff" crossorigin>
 <style>
-@font-face{font-family:"Contract Display";src:url(contract-display.woff) format("woff");font-weight:400 900;font-display:swap}
+@font-face{font-family:"List Display";src:url(list-display.woff) format("woff");font-weight:400 900;font-display:swap}
+@font-face{font-family:"List Type";src:url(list-type.woff) format("woff");font-weight:400 900;font-display:swap}
 @font-face{font-family:"Contract Text";src:url(contract-text.woff) format("woff");font-weight:400 600;font-display:swap}
 @font-face{font-family:"Contract Text";src:url(contract-text-bold.woff) format("woff");font-weight:700 900;font-display:swap}
 :root{--red:#d9531e;--red2:#ff8a3d;--bg:#0e0c0b;--panel:rgba(18,15,13,.94);--line:rgba(255,255,255,.09);--txt:#ececec;--dim:#8d9099;--gold:#f2c14e;--good:#4ade80;--bad:#ff4d5e;
@@ -466,6 +468,121 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;ba
 .vm-h{font-family:var(--hf);letter-spacing:.14em;color:var(--gold);margin-bottom:12px}.vm-h .ico{width:18px;height:18px}
 .vm-t p{margin:0 0 10px;font-size:16px;line-height:1.5;font-style:italic;color:#eadfce;animation:cncap .6s ease-out}
 .item.locked{opacity:.5}
+
+.mm-open{position:absolute;left:-4px;top:-4px;width:30px;height:30px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.mm-open .ico{width:16px;height:16px}
+.mmw{cursor:pointer}
+#bigmap{position:fixed;inset:0;z-index:200;background:rgba(6,8,10,.94);display:flex;flex-direction:column;padding:calc(8px + var(--st)) calc(10px + var(--sr)) calc(8px + var(--sb)) calc(10px + var(--sl))}
+#bigmap .bm-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#bigmap .bm-t{font-family:var(--hf);font-weight:700;letter-spacing:.12em;font-size:15px;flex:1;min-width:120px}
+#bigmap .bm-fl{display:flex;gap:4px;flex-wrap:wrap}
+#bigmap .bm-fl button{padding:8px 12px;background:#1d2024;border:1px solid var(--line);font-family:var(--hf);font-weight:700;font-size:12px;letter-spacing:.08em}
+#bigmap .bm-fl button.on{background:var(--red);border-color:var(--red2)}
+#bigmap .bm-fl button.you::after{content:" \2022";color:#fff}
+#bmCv{flex:1;width:100%;min-height:0;touch-action:none}
+#bigmap .bm-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--dim);justify-content:center}
+#bigmap .bm-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}#bigmap .bm-leg i.sq{border-radius:1px}
+#bigmap .bm-hint{text-align:center;font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:.06em}
+
+/* ---------- responsive icon columns (no cropping in short landscape screens) ---------- */
+.side-btns{gap:clamp(3px,1vh,8px);max-height:calc(100vh - 94px - var(--st) - var(--sb));overflow-y:auto;scrollbar-width:none}
+.side-btns::-webkit-scrollbar{display:none}
+.sb{width:clamp(44px,10.5vh,64px);height:clamp(38px,9.6vh,60px);flex:none}
+.sb b .ico{width:clamp(15px,4.2vh,24px);height:clamp(15px,4.2vh,24px)}
+.sb small{font-size:clamp(8px,2vh,11px)}
+@media (orientation:portrait){.sb{width:56px;height:54px}.sb b .ico{width:22px;height:22px}.sb small{font-size:10px}}
+.rbtns{gap:clamp(4px,1.1vh,8px);flex-flow:column wrap-reverse;max-height:calc(100vh - 170px - var(--st) - var(--sb));align-content:flex-start}
+.rb{width:clamp(40px,11vh,56px);height:clamp(40px,11vh,56px);flex:none}
+.rb .ico{width:clamp(16px,4vh,22px);height:clamp(16px,4vh,22px)}
+.rb small{font-size:clamp(7px,1.7vh,8px)}
+#shud .s-left,#shud .s-right{gap:clamp(4px,1.1vh,8px)}
+#sFire{width:clamp(64px,19vh,96px);height:clamp(64px,19vh,96px)}
+@media (orientation:portrait){.rb{width:52px;height:52px}.rbtns{max-height:calc(100vh - 260px - var(--st) - var(--sb))}}
+
+/* ================= THE LIST: case-file theme ================= */
+:root{--hf:"List Display",Georgia,serif;--tf:"List Type","Courier New",monospace;--paper:#e8dfcc;--ink:#1d1712;--manila:#c8ad7c}
+body{background:#0b0908}
+.ico{stroke-width:2.3;stroke-linecap:square;stroke-linejoin:miter}
+.btn,.tab,.sh-title,.city-name,.r-head,.b-name,.pill,.dock button,.logo h1,.tap,.kf-t,.lb-t,.bn-t,.lu-k,.lu-n,.r-rank,.ctx-h,.bm-t,.rec-tot b,.pet-card b,#cine .cn-title b{font-family:var(--hf)!important;font-stretch:normal;letter-spacing:.06em}
+.sec,.hint,.sb small,.rb small,.chap-tag,.city-n,.city-v,.rr-n,.b-city,.cn-who,.cn-next,.tro span,.tro small,.keep span,.it-d,.rr-c span,#obj,#toasts .toast,.cn-line,.vm-t p,.vm-h,.rules div,.bm-leg,.bm-hint,#cine .cn-title span,.logo .sub,.tap,.lu-k,.dock button{font-family:var(--tf)!important;letter-spacing:.04em}
+.dock button{font-size:13px;font-weight:700;letter-spacing:.06em}
+.logo h1{font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.logo .sub{font-size:14px;letter-spacing:.18em;color:#d8c9b1}
+/* sheets: dark case-file folders with a manila tab and a paper-clip */
+.sheet{clip-path:none!important;border-radius:3px;border:1px solid rgba(232,223,204,.08);
+ background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px),linear-gradient(170deg,#1d1814,#120f0c)!important;box-shadow:0 18px 50px rgba(0,0,0,.65)}
+.sh-head{border-bottom:1px dashed rgba(232,223,204,.16);position:relative}
+.sh-title{background:var(--manila);color:var(--ink);padding:6px 16px 5px!important;font-size:21px;letter-spacing:.08em;transform:rotate(-1.2deg);box-shadow:2px 3px 0 rgba(0,0,0,.45);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 100%,0 100%)}
+.sh-head::after{content:"";position:absolute;right:58px;top:-10px;width:12px;height:34px;border:3px solid #9da3a8;border-radius:8px;opacity:.75}
+.tabs{gap:4px}
+.tab{clip-path:none!important;border-radius:6px 6px 0 0;background:#2a231d;color:#c9bba4;font-size:15px;border-bottom:2px solid #3a3027}
+.tab.on{background:var(--manila);color:var(--ink);border-bottom-color:var(--manila)}
+.sec{color:#c9b38a;border-bottom:1px dashed rgba(201,179,138,.3);padding-bottom:4px;font-size:12px}
+.hint{color:#a99d8c}
+/* buttons: stamped labels */
+.btn{clip-path:none!important;border-radius:2px;background:linear-gradient(180deg,#2d2620,#1d1813);border:1px solid rgba(232,223,204,.14);font-size:17px}
+.btn.primary{background:linear-gradient(180deg,#e2632a,#8f3210)!important;border-color:#ffb37a;box-shadow:0 0 18px rgba(217,83,30,.35)}
+.btn.sm{font-size:13px}
+/* the dock: a strip of tape across the bottom */
+#hhud .dock{clip-path:none!important;border-radius:2px;background:linear-gradient(180deg,rgba(32,26,21,.96),rgba(18,14,11,.96));border:1px solid rgba(232,223,204,.1);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.dock .main{background:linear-gradient(180deg,#e2632a,#8f3210)!important;font-size:20px}
+/* side buttons: paper tags */
+.sb{clip-path:polygon(0 0,100% 0,100% 100%,14% 100%,0 86%)!important;background:linear-gradient(180deg,#2b241e,#1a1511)!important;border-left:3px solid var(--red)}
+.sb small{font-size:clamp(8px,1.9vh,10px)!important;color:#d9ccb6}
+/* rank letters as rubber stamps */
+.rank{font-family:var(--hf);color:var(--red2);border:2.5px solid currentColor;border-radius:4px;padding:0 6px;line-height:1.15;transform:rotate(-9deg);opacity:.9;font-size:20px;mix-blend-mode:screen}
+.rank.sm{font-size:15px;width:auto;padding:0 5px}
+.r-rank{font-family:var(--hf)!important;display:inline-block;border:6px solid currentColor;border-radius:10px;padding:0 22px;transform:rotate(-8deg);text-shadow:none!important;filter:drop-shadow(0 0 18px rgba(255,120,40,.35));
+ -webkit-mask-image:radial-gradient(circle at 30% 40%,#000 60%,rgba(0,0,0,.75) 61%,#000 64%),radial-gradient(circle at 70% 70%,#000 50%,rgba(0,0,0,.8) 52%);-webkit-mask-composite:source-in}
+/* toasts: typed strips of tape */
+.toast{clip-path:none!important;background:var(--paper)!important;color:var(--ink)!important;border:0!important;border-radius:1px!important;font-weight:700;box-shadow:2px 3px 0 rgba(0,0,0,.45);transform:rotate(-.6deg)}
+.toast.good{border-left:5px solid #3c8a4c!important}.toast.bad{border-left:5px solid #b2321c!important}.toast.big{font-family:var(--hf)!important;font-size:18px}
+/* contract tiles as polaroids */
+.city{border-radius:2px!important;border:5px solid #d9cfbd!important;border-bottom-width:18px!important;background:linear-gradient(160deg,#2b2520,#15110e)!important;box-shadow:3px 5px 0 rgba(0,0,0,.4)}
+.city:nth-child(3n+1){transform:rotate(-.8deg)}.city:nth-child(3n+2){transform:rotate(.6deg)}
+.city.locked{filter:grayscale(1) brightness(.6)}
+.city-name{font-size:clamp(14px,2.2vw,19px)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* briefing handler box: a typed note */
+.handler{background:var(--paper)!important;color:var(--ink)!important;border:0!important;border-left:0!important;transform:rotate(-.4deg);box-shadow:3px 4px 0 rgba(0,0,0,.45)}
+.handler b{font-family:var(--hf);color:#8f3210!important;letter-spacing:.06em}
+.handler p{font-family:var(--tf);color:var(--ink)!important;font-size:14px;line-height:1.5}
+.handler .h-av{background:#8f3210!important;color:var(--paper)}
+/* agent card + hud panels */
+.agent,.tcard,#hhud .agentCard{border-radius:2px}
+/* cutscene captions on paper */
+#cine .cn-cap{background:rgba(232,223,204,.95)!important;color:var(--ink);border-left-width:6px}
+#cine .cn-cap .cn-line{color:var(--ink);font-size:16px}
+#cine .cn-cap .cn-who{color:#8f3210}
+#cine .cn-cap.narr{background:rgba(10,8,6,.85)!important}#cine .cn-cap.narr .cn-line{color:#efe3cf}
+#cine .cn-cap.memory{background:rgba(245,226,180,.95)!important}
+#cine .cn-title b{font-weight:700;letter-spacing:.08em}
+/* List sheet entries as pinned index cards */
+.tro{background:var(--paper)!important;color:var(--ink)!important;border:0!important;border-radius:1px;box-shadow:2px 3px 0 rgba(0,0,0,.45)}
+.tro b{color:var(--ink)}.tro small{color:#5a4d40}.tro span{color:#8f3210}
+.tro:nth-child(odd){transform:rotate(-.7deg)}.tro:nth-child(even){transform:rotate(.5deg)}
+.tro::before{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#b2321c;box-shadow:0 2px 2px rgba(0,0,0,.5)}
+.tro.locked{background:#3a332b!important;color:#9b8f80!important}.tro.locked b,.tro.locked span{color:#9b8f80}
+.tro.crossed b{text-decoration-color:#b2321c!important}
+.tro .xmark{color:#b2321c}
+.tro.cur{outline:3px solid var(--red2);outline-offset:2px}
+.keep{background:#1d1814!important}
+/* results */
+.r-head{font-size:34px!important;letter-spacing:.08em}
+
+/* ---------- analogue stick, look pad, first-person crosshair, use button ---------- */
+#lookpad{position:fixed;inset:0;touch-action:none}
+#stickzone{position:fixed;left:0;bottom:0;width:42%;height:55%;touch-action:none}
+#stickBase{position:fixed;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;border:2px solid rgba(255,255,255,.28);background:rgba(0,0,0,.28);opacity:0;transition:opacity .12s;pointer-events:none;z-index:2}
+#stickBase.on{opacity:1}
+#stickKnob{position:absolute;left:50%;top:50%;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.5);transform:translate(-50%,-50%)}
+.stk-hint{position:absolute;left:calc(24px + var(--sl));bottom:calc(24px + var(--sb));width:clamp(70px,20vh,100px);height:clamp(70px,20vh,100px);border-radius:50%;border:2px dashed rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.45);pointer-events:none;transition:opacity .2s}
+#stickBase.on~.stk-hint{opacity:0}
+#xhair{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.55);pointer-events:none;z-index:5}
+#useBtn{position:fixed;right:calc(clamp(56px,13vh,72px) + 14px + var(--sr));bottom:calc(16px + var(--sb));z-index:8;min-width:80px;padding:9px 12px;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--red);border:2px solid var(--red2);border-radius:12px;font-family:var(--hf);letter-spacing:.08em;box-shadow:0 4px 16px rgba(0,0,0,.45)}
+#useBtn .ico{width:22px;height:22px}#useBtn b{font-size:15px}#useBtn small{font-size:10px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+#useBtn:active{transform:scale(.94)}
+.rb.on{background:var(--red)!important}
+@media (orientation:portrait){#useBtn{bottom:calc(150px + var(--sb))}#stickzone{height:45%;bottom:80px}}
 </style>
 </head>
 <body>
@@ -488,25 +605,25 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;ba
     <div class="wallet"><div class="pill tok" id="hTokP">{i:ticket} <b id="hTok">0</b></div><div class="pill money" id="hMoney">$0</div></div>
   </div>
   <div class="side-btns">
-    <button class="sb" id="bDaily"><b>{i:gift}</b><small>DROP</small></button>
-    <button class="sb" id="bChal"><b>{i:target}</b><small>LEADS</small></button>
-    <button class="sb" id="bAch"><b>{i:trophy}</b><small>FEATS</small></button>
+    <button class="sb" id="bDaily"><b>{i:envelope}</b><small>DROP</small></button>
+    <button class="sb" id="bChal"><b>{i:thread}</b><small>LEADS</small></button>
+    <button class="sb" id="bAch"><b>{i:medal}</b><small>FEATS</small></button>
     <button class="sb" id="bRec"><b>{i:podium}</b><small>RECORDS</small></button>
     <button class="sb" id="bSet"><b>{i:cog}</b><small>SETTINGS</small></button>
   </div>
   <div class="dock">
-    <button data-st="wardrobe"><b>{i:shirt}</b>Wardrobe</button>
-    <button data-st="armory"><b>{i:gun}</b>Fence</button>
+    <button data-st="wardrobe"><b>{i:coat}</b>Wardrobe</button>
+    <button data-st="armory"><b>{i:crowbar}</b>Fence</button>
     <button data-st="gear"><b>{i:bag}</b>Kit</button>
-    <button data-st="upgrades"><b>{i:home}</b>Rebuild</button>
-    <button data-st="contracts" class="main"><b>{i:fire}</b>HUNT</button>
+    <button data-st="upgrades"><b>{i:hammer}</b>Rebuild</button>
+    <button data-st="contracts" class="main"><b>{i:match}</b>HUNT</button>
   </div>
 </div>
 
 <div id="mhud" class="hidden">
   <div class="tcard"><canvas id="tPortrait" width="48" height="48"></canvas><div><div class="tn"><span id="tName">Target</span><small>TARGET</small></div><div id="tStatus">—</div><div class="subl">{i:shirt} <span id="disg">Your Suit</span> · <span id="zone">Public</span></div></div></div>
   <div id="obj"></div>
-  <div class="mmw"><canvas id="mm" width="264" height="264"></canvas><div id="mmFloor">GROUND</div><div id="hpbar"><i></i></div></div>
+  <div class="mmw"><canvas id="mm" width="264" height="264"></canvas><div class="mm-open">{i:map}</div><div id="mmFloor">GROUND</div><div id="hpbar"><i></i></div></div>
   <div id="aware" class="aware hidden"></div>
   <div id="inv"></div>
   <div class="rbtns">
@@ -558,6 +675,12 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;ba
   <button class="cn-skip" id="cnSkip">SKIP {i:fast}</button>
 </div>
 
+<div id="bigmap" class="hidden">
+  <div class="bm-top"><div class="bm-t">{i:map} <span id="bmCity"></span></div><div class="bm-fl" id="bmFloors"></div><button class="rb" id="bmClose">{i:x}<small>CLOSE</small></button></div>
+  <canvas id="bmCv"></canvas>
+  <div class="bm-leg"><span><i style="background:#fff"></i>You</span><span><i style="background:#ff8a3d"></i>Target</span><span><i style="background:#6af"></i>Guard</span><span><i style="background:#ddd"></i>Civilian</span><span><i style="background:#3f6"></i>Exit</span><span><i style="background:#f5d142"></i>Item</span><span><i style="background:#c77dff"></i>Disguise</span><span><i class="sq" style="background:#968246"></i>Staff area</span><span><i class="sq" style="background:#963c3c"></i>Security</span><span><i class="sq" style="background:#785096"></i>VIP</span></div>
+  <div class="bm-hint">Tap anywhere on the map to walk there</div>
+</div>
 <div id="popups"></div>
 <div id="instfx" class="hidden"></div>
 <div id="tut" class="hidden"></div>
@@ -585,5 +708,6 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;ba
 <script src="ui.js"></script>
 <script src="menus.js"></script>
 <script src="extras.js"></script>
+<script src="controls.js"></script>
 </body>
 </html>
